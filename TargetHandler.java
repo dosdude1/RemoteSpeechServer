@@ -24,7 +24,9 @@ public class TargetHandler extends Thread
     private int volume;
     private boolean updateIsAvaiable;
     
-    private Client clientRequestingToSendAudio;
+    private boolean receivingRawData = false;
+    
+    private DataTransferHandler dth;
     
     
     public TargetHandler(Socket clientSocket, BufferedReader in, PrintWriter out, String inID, RemoteSpeechServer inMain)
@@ -114,7 +116,8 @@ public class TargetHandler extends Thread
                 }
                 else if (read.contains("ready-to-receive"))
                 {
-                    clientRequestingToSendAudio.beginSendingAudioData();
+                    receivingRawData = true;
+                    dth.start();
                 }
             }
             catch (SocketTimeoutException e)
@@ -188,15 +191,18 @@ public class TargetHandler extends Thread
     }
     void sendMessage(String msg)
     {
-        output.println(msg);
-        output.flush();
+        if (!receivingRawData)
+        {
+            output.println(msg);
+            output.flush();
+        }
     }
     void prepareToReceiveAudio(String fileName, int expectedFileSize, Client requestingClient)
     {
+        dth = new DataTransferHandler(requestingClient, this, expectedFileSize, fileName);
         sendMessage("receiving-audio:"+fileName+";"+expectedFileSize);
-        clientRequestingToSendAudio = requestingClient;
     }
-    DataOutputStream getOutputStream()
+    DataOutputStream getDataOutputStream()
     {
         try
         {
@@ -207,5 +213,18 @@ public class TargetHandler extends Thread
             System.err.println(e);
         }
         return null;
+    }
+    void audioSendingComplete()
+    {
+        receivingRawData = false;
+    }
+    boolean isReceivingAudio()
+    {
+        return receivingRawData;
+    }
+    void dataTransferSocketErrorOccurred()
+    {
+        System.out.println("TargetHandler Data I/O Exception");
+        closeSocket();
     }
 }

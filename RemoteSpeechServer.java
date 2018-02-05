@@ -297,17 +297,14 @@ public class RemoteSpeechServer
     {
         if (connectedTargets.containsKey(targetID))
         {
-            connectedTargets.get(targetID).prepareToReceiveAudio(audioFileName, expectedFileSize, requestingClient);
-            return true;
+            TargetHandler t = connectedTargets.get(targetID);
+            if (!t.isReceivingAudio())
+            {
+                t.prepareToReceiveAudio(audioFileName, expectedFileSize, requestingClient);
+                return true;
+            }
+            return false;
         }
         return false;
-    }
-    DataOutputStream getTargetOutputStream(String targetID)
-    {
-        if (connectedTargets.containsKey(targetID))
-        {
-            return connectedTargets.get(targetID).getOutputStream();
-        }
-        return null;
     }
 }

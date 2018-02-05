@@ -5,8 +5,6 @@ package RemoteSpeechServer;
 import java.net.*;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /*
  * Handles the connection of a single client connected to the RemoteSpeechServer
@@ -28,9 +26,6 @@ public class Client extends Thread
     private boolean receivingRawData = false;
     private int expectedFileSize = 0;
     private String targetIDToSendAudio;
-    
-    private Timer dataStreamChecker;
-    private boolean dataStreamDied = false;
     
     public Client(Socket clientSocket, BufferedReader in, PrintWriter out, String inName, RemoteSpeechServer inMain)
     {
@@ -54,6 +49,7 @@ public class Client extends Thread
                 {
                     //Waits for the next line of incoming data.
                     read = input.readLine();
+                    
                     if (read == null || read.equals("close-connection"))
                     {
                         //Handle disconnect event.
@@ -160,31 +156,14 @@ public class Client extends Thread
                 }
                 else
                 {
-                    dataStreamDied = false;
-                    TimerTask timerTask = new TimerTask() {
-                        
-                        @Override
-                        public void run() {
-                            checkDataStream();
-                        }
-                    };
-                    dataStreamChecker = new Timer();
-                    dataStreamChecker.scheduleAtFixedRate(timerTask, 3000, 3000);
-                    int count = 0;
-                    int totalSize = 0;
-                    byte[] buffer = new byte[8192];
-                    DataInputStream in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-                    DataOutputStream out = main.getTargetOutputStream(targetIDToSendAudio);
-                    while ((totalSize < expectedFileSize) && receivingRawData)
+                    try
                     {
-                        count = in.read(buffer);
-                        totalSize += count;
-                        out.write(buffer, 0, count);
-                        out.flush();
-                        dataStreamDied = false;
+                        Thread.sleep(0);
                     }
-                    dataStreamChecker.cancel();
-                    receivingRawData = false;
+                    catch(Exception e)
+                    {
+                        
+                    }
                 }
             }
             catch (SocketTimeoutException e)
@@ -196,7 +175,6 @@ public class Client extends Thread
             {
                 System.out.println(e);
                 System.out.println("ClientHandler Exception - User: "+name);
-                dataStreamChecker.cancel();
                 closeSocket();
                 return;
             }
@@ -253,13 +231,20 @@ public class Client extends Thread
         output.println(msg);
         output.flush();
     }
-    void checkDataStream()
+    DataInputStream getDataInputStream()
     {
-        if (dataStreamDied)
+        try
         {
-            receivingRawData = false;
-            dataStreamChecker.cancel();
+            return new DataInputStream(new BufferedInputStream(socket.getInputStream()));
         }
-        dataStreamDied = true;
+        catch (IOException e)
+        {
+            System.err.println(e);
+        }
+        return null;
+    }
+    void audioSendingComplete()
+    {
+        receivingRawData = false;
     }
 }
