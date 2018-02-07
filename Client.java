@@ -158,7 +158,7 @@ public class Client extends Thread
                 {
                     try
                     {
-                        Thread.sleep(0);
+                        Thread.sleep(10);
                     }
                     catch(Exception e)
                     {
@@ -228,8 +228,11 @@ public class Client extends Thread
      */
     void sendMessage(String msg)
     {
-        output.println(msg);
-        output.flush();
+        if (!receivingRawData)
+        {
+            output.println(msg);
+            output.flush();
+        }
     }
     DataInputStream getDataInputStream()
     {

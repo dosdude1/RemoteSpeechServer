@@ -15,6 +15,7 @@ public class DataTransferHandler extends Thread
     
     private Timer dataStreamChecker;
     private boolean dataStreamDied = false;
+    private boolean continueSendingData = true;
     
     public DataTransferHandler(Client inRequestingClient, TargetHandler inReceivingTarget, int inExpectedFileSize, String inFileName)
     {
@@ -43,7 +44,7 @@ public class DataTransferHandler extends Thread
             DataInputStream in = requestingClient.getDataInputStream();
             DataOutputStream out = receivingTarget.getDataOutputStream();
             requestingClient.beginSendingAudioData();
-            while (totalSize < expectedFileSize)
+            while ((totalSize < expectedFileSize) && continueSendingData)
             {
                 count = in.read(buffer);
                 totalSize += count;
@@ -60,14 +61,20 @@ public class DataTransferHandler extends Thread
             requestingClient.audioSendingComplete();
             receivingTarget.audioSendingComplete();
             receivingTarget.dataTransferSocketErrorOccurred();
+            dataStreamChecker.cancel();
             System.err.println(e);
         }
+        return;
     }
     void checkDataStream()
     {
         if (dataStreamDied)
         {
-            dataStreamChecker.cancel();
+            if (dataStreamChecker != null)
+            {
+                dataStreamChecker.cancel();
+            }
+            continueSendingData = false;
             requestingClient.audioSendingComplete();
             receivingTarget.audioSendingComplete();
         }
