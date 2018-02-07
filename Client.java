@@ -228,11 +228,8 @@ public class Client extends Thread
      */
     void sendMessage(String msg)
     {
-        if (!receivingRawData)
-        {
-            output.println(msg);
-            output.flush();
-        }
+        output.println(msg);
+        output.flush();
     }
     DataInputStream getDataInputStream()
     {
