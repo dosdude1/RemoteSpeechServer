@@ -3,14 +3,14 @@ package RemoteSpeechServer;
 
 public class Target
 {
-    
+
     private String ID;
     private String name;
-    
+
     public Target(String inTargetID, String inName)
     {
-        ID=inTargetID;
-        name=inName;
+        ID = inTargetID;
+        name = inName;
     }
     public String toString()
     {
@@ -22,6 +22,6 @@ public class Target
     }
     void setName(String s)
     {
-        name=s;
+        name = s;
     }
 }

@@ -13,7 +13,7 @@ import java.util.Set;
 
 public class TargetHandler extends Thread
 {
-    
+
     private Socket socket;
     private String ID;
     private BufferedReader input;
@@ -23,27 +23,27 @@ public class TargetHandler extends Thread
     private String voices;
     private int volume;
     private boolean updateIsAvaiable;
-    
+
     private boolean receivingRawData = false;
-    
+
     private DataTransferHandler dth;
-    
-    
+
+
     public TargetHandler(Socket clientSocket, BufferedReader in, PrintWriter out, String inID, RemoteSpeechServer inMain)
     {
-        main=inMain;
-        socket=clientSocket;
-        ID=inID;
-        input=in;
-        output=out;
+        main =   inMain;
+        socket = clientSocket;
+        ID =     inID;
+        input =  in;
+        output = out;
     }
     /*
      * Main EventLoop
      */
     public void run()
     {
-        String read=null;
-        Hashtable<String, User> users=main.getUsers();
+        String read = null;
+        Hashtable<String, User> users = main.getUsers();
         while (true)
         {
             try
@@ -54,22 +54,20 @@ public class TargetHandler extends Thread
                 {
                     //Handle disconnect event.
                     closeSocket();
-                    
-                    
                     //Terminate EventLoop.
                     return;
                 }
                 else if (read.contains("voice:"))
                 {
-                    currentVoice=read.substring(read.indexOf(":")+1);
+                    currentVoice = read.substring(read.indexOf(":")+1);
                 }
                 else if (read.contains("voices:"))
                 {
-                    voices=read.substring(read.indexOf(":")+1);
+                    voices = read.substring(read.indexOf(":")+1);
                 }
                 else if (read.contains("volume:"))
                 {
-                    volume=Integer.valueOf(read.substring(read.indexOf(":")+1));
+                    volume = Integer.valueOf(read.substring(read.indexOf(":")+1));
                 }
                 else if (read.equals("update-client-info"))
                 {
@@ -77,7 +75,7 @@ public class TargetHandler extends Thread
                     for (String key : keys)
                     {
                         String [] targetIDs=users.get(key).getTargetIDs();
-                        for (int j=0; j<targetIDs.length; j++)
+                        for (int j = 0; j < targetIDs.length; j++)
                         {
                             if (ID.equals(targetIDs[j]))
                             {
@@ -88,14 +86,14 @@ public class TargetHandler extends Thread
                 }
                 else if (read.contains("update-status:"))
                 {
-                    String update=read.substring(read.indexOf(":")+1);
+                    String update = read.substring(read.indexOf(":")+1);
                     if (update.equals("yes"))
                     {
-                        updateIsAvaiable=true;
+                        updateIsAvaiable = true;
                     }
                     else
                     {
-                        updateIsAvaiable=false;
+                        updateIsAvaiable = false;
                     }
                 }
                 else if (read.contains("update-result:"))
@@ -104,12 +102,12 @@ public class TargetHandler extends Thread
                     Set<String> keys = users.keySet();
                     for (String key : keys)
                     {
-                        String [] targetIDs=users.get(key).getTargetIDs();
-                        for (int j=0; j<targetIDs.length; j++)
+                        String [] targetIDs = users.get(key).getTargetIDs();
+                        for (int j = 0; j < targetIDs.length; j++)
                         {
                             if (ID.equals(targetIDs[j]))
                             {
-                                main.sendMessageToClientsOfName(key, "update-result:"+ID+";"+result);
+                                main.sendMessageToClientsOfName(key, "update-result:" + ID + ";" + result);
                             }
                         }
                     }
@@ -122,7 +120,7 @@ public class TargetHandler extends Thread
             }
             catch (SocketTimeoutException e)
             {
-                output.println("heartbeat");
+                output.println("Socket connection timed out");
                 output.flush();
             }
             catch (IOException e)
@@ -183,7 +181,7 @@ public class TargetHandler extends Thread
      */
     public boolean equals(TargetHandler t)
     {
-        if (this==t)
+        if (this == t)
         {
             return true;
         }
@@ -200,7 +198,7 @@ public class TargetHandler extends Thread
     void prepareToReceiveAudio(String fileName, int expectedFileSize, Client requestingClient)
     {
         dth = new DataTransferHandler(requestingClient, this, expectedFileSize, fileName);
-        sendMessage("receiving-audio:"+fileName+";"+expectedFileSize);
+        sendMessage("receiving-audio:" + fileName + ";" + expectedFileSize);
     }
     DataOutputStream getDataOutputStream()
     {

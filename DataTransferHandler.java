@@ -7,16 +7,16 @@ import java.util.TimerTask;
 
 public class DataTransferHandler extends Thread
 {
-    
+
     private Client requestingClient;
     private TargetHandler receivingTarget;
     private int expectedFileSize;
     private String fileName;
-    
+
     private Timer dataStreamChecker;
     private boolean dataStreamDied = false;
     private boolean continueSendingData = true;
-    
+
     public DataTransferHandler(Client inRequestingClient, TargetHandler inReceivingTarget, int inExpectedFileSize, String inFileName)
     {
         requestingClient = inRequestingClient;
@@ -30,7 +30,7 @@ public class DataTransferHandler extends Thread
         {
             dataStreamDied = false;
             TimerTask timerTask = new TimerTask() {
-                
+
                 @Override
                 public void run() {
                     checkDataStream();
