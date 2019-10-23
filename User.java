@@ -7,20 +7,20 @@ import java.util.ArrayList;
 
 public class User
 {
-    
+
     private String password;
     private String username;
     private ArrayList<Target> targets;
     private FileWriter writer;
     private RemoteSpeechServer main;
-    
+
     public User (String inUsername, String inPassword, RemoteSpeechServer inMain)
     {
         username=inUsername;
         password=inPassword;
         main=inMain;
         targets = new ArrayList<Target>();
-        File dir=new File("users");
+        File dir = new File("users");
         if (!dir.exists())
         {
             dir.mkdir();
@@ -30,13 +30,13 @@ public class User
     {
         try
         {
-            writer=new FileWriter("users/"+username+".txt");
-            for (int i=0; i<targets.size(); i++)
+            writer = new FileWriter("users/"+username+".txt");
+            for (int i = 0; i < targets.size(); i++)
             {
                 String toWrite=targets.get(i).toString()+","+targets.get(i).getName();
                 if (i<targets.size()-1)
                 {
-                    toWrite+="\n";
+                    toWrite += "\n";
                 }
                 writer.write(toWrite);
             }
@@ -58,15 +58,15 @@ public class User
     }
     void initTargets()
     {
-        Scanner in=null;
+        Scanner in = null;
         try
         {
-            in=new Scanner(new File("users/"+username+".txt"));
+            in = new Scanner(new File("users/"+username+".txt"));
             in.useDelimiter("\n|,");
             while (in.hasNext())
             {
-                String targetID=in.next();
-                String targetName=in.next();
+                String targetID = in.next();
+                String targetName = in.next();
                 targets.add(new Target(targetID, targetName));
             }
             in.close();
@@ -83,7 +83,7 @@ public class User
     }
     void removeTarget(String ID)
     {
-        for (int i=0; i<targets.size(); i++)
+        for (int i = 0; i < targets.size(); i++)
         {
             if (targets.get(i).toString().equals(ID))
             {
@@ -94,7 +94,7 @@ public class User
     }
     void renameTarget(String ID, String name)
     {
-        for (int i=0; i<targets.size(); i++)
+        for (int i = 0; i < targets.size(); i++)
         {
             if (targets.get(i).toString().equals(ID))
             {
@@ -105,13 +105,13 @@ public class User
     }
     String [] getTargets()
     {
-        String [] targetList=new String [targets.size()];
+        String [] targetList = new String [targets.size()];
         String targetName;
         String targetID;
         String selectedVoice;
         String onlineStatus;
         String updateStatus;
-        for (int i=0; i<targets.size(); i++)
+        for (int i = 0; i < targets.size(); i++)
         {
             targetName=targets.get(i).getName();
             targetID=targets.get(i).toString();
@@ -132,16 +132,16 @@ public class User
             {
                 updateStatus="No";
             }
-            targetList[i]=targetID+","+targetName+","+selectedVoice+","+onlineStatus+","+updateStatus;
+            targetList[i] = targetID + "," + targetName + "," + selectedVoice + "," + onlineStatus + "," + updateStatus;
         }
         return targetList;
     }
     String [] getTargetIDs()
     {
-        String [] IDs=new String [targets.size()];
-        for (int i=0; i<targets.size(); i++)
+        String [] IDs = new String [targets.size()];
+        for (int i = 0; i < targets.size(); i++)
         {
-            IDs[i]=targets.get(i).toString();
+            IDs[i] = targets.get(i).toString();
         }
         return IDs;
     }

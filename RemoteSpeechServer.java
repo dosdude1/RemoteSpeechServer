@@ -15,7 +15,7 @@ import java.util.Set;
 
 public class RemoteSpeechServer
 {
-    
+
     private ServerSocket listner;
     private Socket socket;
     private int serverPort;
@@ -25,17 +25,17 @@ public class RemoteSpeechServer
     private BufferedReader input;
     private PrintWriter output;
     private FileWriter writer;
-    
-    
+
+
     public RemoteSpeechServer()
     {
-        serverPort=5656;
+        serverPort = 5656;
         initialize();
         eventLoop();
     }
     public RemoteSpeechServer(int inPort)
     {
-        serverPort=inPort;
+        serverPort = inPort;
         initialize();
         eventLoop();
     }
@@ -57,10 +57,10 @@ public class RemoteSpeechServer
     private void initialize()
     {
         users = new Hashtable<String, User>();
-        Scanner in=null;
+        Scanner in = null;
         try
         {
-            File f1=new File("users.txt");
+            File f1 = new File("users.txt");
             if (!f1.exists())
             {
                 writer = new FileWriter("users.txt");
@@ -69,7 +69,7 @@ public class RemoteSpeechServer
             {
                 writer = new FileWriter("users.txt", true);
             }
-            in=new Scanner(f1);
+            in = new Scanner(f1);
         }
         catch (IOException e)
         {
@@ -84,8 +84,8 @@ public class RemoteSpeechServer
             users.put(nuser.toString(), nuser);
         }
         in.close();
-        clients=new Hashtable<String, ArrayList<Client>>();
-        connectedTargets=new Hashtable<String, TargetHandler>();
+        clients = new Hashtable<String, ArrayList<Client>>();
+        connectedTargets = new Hashtable<String, TargetHandler>();
         try
         {
             listner = new ServerSocket(serverPort);
@@ -94,7 +94,7 @@ public class RemoteSpeechServer
         {
             System.out.println(e);
         }
-        
+
     }
     /*
      * Main EventLoop, handles all incoming connections.
@@ -113,7 +113,7 @@ public class RemoteSpeechServer
                 input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 socket.setKeepAlive(true);
                 socket.setSoTimeout(60000);
-                ConnectionHandler ch=new ConnectionHandler(socket, input, output, this);
+                ConnectionHandler ch = new ConnectionHandler(socket, input, output, this);
                 ch.start();
             }
             catch (IOException e)
@@ -144,7 +144,7 @@ public class RemoteSpeechServer
     }
     void sendMessageToTargets(String s[], String message)
     {
-        for (int i=0; i<s.length; i++)
+        for (int i = 0; i<s.length; i++)
         {
             if (connectedTargets.containsKey(s[i]))
             {
@@ -164,7 +164,7 @@ public class RemoteSpeechServer
         if (clients.containsKey(name))
         {
             ArrayList<Client> clientsOfName=clients.get(name);
-            for (int i=0; i<clientsOfName.size(); i++)
+            for (int i = 0; i<clientsOfName.size(); i++)
             {
                 clientsOfName.get(i).sendMessage(message);
             }
@@ -241,14 +241,14 @@ public class RemoteSpeechServer
     }
     void addClient(Client toAdd)
     {
-        ArrayList<Client> c=null;
+        ArrayList<Client> c = null;
         if (clients.containsKey(toAdd.toString()))
         {
-            c=clients.get(toAdd.toString());
+            c = clients.get(toAdd.toString());
         }
         else
         {
-            c=new ArrayList<Client>();
+            c = new ArrayList<Client>();
         }
         c.add(toAdd);
         clients.put(toAdd.toString(), c);
@@ -265,7 +265,7 @@ public class RemoteSpeechServer
         System.out.println("User \""+toRemove+"\" disconnected.");
         if (clients.containsKey(toRemove.toString()))
         {
-            ArrayList<Client> c=clients.get(toRemove.toString());
+            ArrayList<Client> c = clients.get(toRemove.toString());
             if (c.size()>1)
             {
                 c.remove(toRemove);
@@ -284,7 +284,7 @@ public class RemoteSpeechServer
         for (String key : keys)
         {
             String [] targetIDs=users.get(key).getTargetIDs();
-            for (int j=0; j<targetIDs.length; j++)
+            for (int j = 0; j<targetIDs.length; j++)
             {
                 if (toRemove.toString().equals(targetIDs[j]))
                 {
